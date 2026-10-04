@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Revision - Created by Yusuf Ghoneim</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Playfair Display -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: {
+                            50: '#fdf2f4',
+                            100: '#fbe7ea',
+                            300: '#f0b4bd',
+                            600: '#a32b4b',
+                            800: '#6A0F2D',
+                            900: '#4d0a1f',
+                            950: '#330513',
+                        },
+                        gold: {
+                            400: '#e6c567',
+                            500: '#D4AF37',
+                            600: '#b89423',
+                            700: '#947517'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a030a;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Glassmorphism cards */
+        .glass-card {
+            background: rgba(106, 15, 45, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel {
+            background: rgba(26, 3, 10, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Glowing effects */
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        }
+        .burgundy-glow {
+            box-shadow: 0 0 30px rgba(163, 43, 75, 0.4);
+        }
+
+        /* Floating background bubbles */
+        @keyframes floatBubble {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.4), rgba(106, 15, 45, 0.6));
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatBubble linear infinite;
+        }
+
+        /* Shake animation for incorrect answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Pulse glow for correct answer */
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .animate-success-pulse {
+            animation: successPulse 0.8s cubic-bezier(0.4, 0, 0.6, 1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a030a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6A0F2D;
+            border-radius: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a32b4b;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between relative selection:bg-gold-500 selection:text-burgundy-950">
+
+    <div id="bubble-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-burgundy-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="relative z-10 w-full border-b border-gold-500/20 bg-burgundy-950/80 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.returnToHome()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-burgundy-600 flex items-center justify-center gold-glow">
+                    <i class="fa-solid fa-flask-vial text-burgundy-950 text-lg font-bold"></i>
+                </div>
+                <div>
+                    <h1 class="font-serif text-2xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-500 to-burgundy-300">
+                        Chemistry Revision
+                    </h1>
+                    <p class="text-xs text-gold-400/80 font-medium tracking-widest uppercase">Grade 11 • Acids & Bases Masterclass</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 bg-burgundy-900/60 border border-gold-500/30 px-3 py-1.5 rounded-full text-sm">
+                    <i class="fa-solid fa-volume-high text-gold-400" id="sound-icon"></i>
+                    <span class="text-xs text-gold-200 font-semibold" id="sound-status">Sound ON</span>
+                    <button onclick="app.toggleSound()" class="ml-1 text-gold-400 hover:text-gold-300 focus:outline-none">
+                        <i class="fa-solid fa-power-off text-xs"></i>
+                    </button>
+                </div>
+                <div class="hidden sm:flex items-center space-x-2 text-xs text-gold-400/90 font-medium">
+                    <span>Created by <strong class="text-gold-400 underline decoration-gold-500/50">Yusuf Ghoneim</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 max-w-4xl mx-auto w-full">
+
+        <!-- VIEW 1: HOME SCREEN -->
+        <div id="home-view" class="w-full text-center glass-card rounded-3xl p-8 sm:p-12 gold-glow transition-all duration-500">
+            <!-- Animated Glowing Beaker & Flask Icon with Title Below -->
+            <div class="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-gold-500/30 to-burgundy-600/30 blur-2xl animate-pulse"></div>
+                <div class="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-burgundy-800 to-burgundy-900 border-2 border-gold-400 flex items-center justify-center gold-glow transform hover:scale-105 transition-transform duration-300">
+                    <i class="fa-solid fa-flask text-4xl text-gold-400 animate-bounce duration-1000"></i>
+                    <div class="absolute bottom-3 w-3 h-3 bg-gold-300 rounded-full animate-ping"></div>
+                </div>
+            </div>
+
+            <h2 class="font-serif text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-500 to-burgundy-300 mb-2 tracking-wide drop-shadow-md">
+                Chemistry Revision
+            </h2>
+<p class="text-5xl uppercase tracking-widest text-gold-400 font-semibold mb-6">
+    Chemistry Rivison
+</p>
+            <p class="text-gold-100/80 text-base sm:text-lg max-w-2xl mx-auto mb-8 font-light leading-relaxed">
+                SOLVE YA 7ABIB DEEN OMY YA NANO
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 text-left">
+                <div class="bg-burgundy-900/50 border border-gold-500/20 rounded-xl p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-400 text-lg">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gold-400/70 font-semibold uppercase">Questions</div>
+                        <div class="text-lg font-bold text-white">50 Randomized MCQs</div>
+                    </div>
+                </div>
+                <div class="bg-burgundy-900/50 border border-gold-500/20 rounded-xl p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-400 text-lg">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gold-400/70 font-semibold uppercase">Feedback</div>
+                        <div class="text-lg font-bold text-white">Instant & Animated</div>
+                    </div>
+                </div>
+                <div class="bg-burgundy-900/50 border border-gold-500/20 rounded-xl p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center text-gold-400 text-lg">
+                        <i class="fa-solid fa-headphones"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gold-400/70 font-semibold uppercase">Audio FX</div>
+                        <div class="text-lg font-bold text-white">Synthesized Web Audio</div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="app.startQuiz()" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-burgundy-950 transition-all duration-300 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl hover:from-gold-300 hover:to-gold-500 gold-glow transform hover:-translate-y-1 active:translate-y-0 text-lg">
+                <span class="relative z-10 flex items-center space-x-3">
+                    <span>Start 50-Question Masterclass</span>
+                    <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- VIEW 2: QUIZ SCREEN -->
+        <div id="quiz-view" class="hidden w-full glass-card rounded-3xl p-6 sm:p-10 gold-glow transition-all duration-500">
+            <!-- Quiz Progress & Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gold-500/20">
+                <div>
+                    <span id="question-category" class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gold-500/20 text-gold-300 border border-gold-500/30 uppercase tracking-widest mb-1">
+                        Category
+                    </span>
+                    <h3 class="font-serif text-xl sm:text-2xl font-bold text-white" id="question-counter">
+                        Question 1 of 50
+                    </h3>
+                </div>
+                <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <div class="text-right">
+                        <div class="text-xs text-gold-400 font-semibold uppercase">Score</div>
+                        <div class="text-lg font-bold text-white" id="current-score">0 pts</div>
+                    </div>
+                    <div class="w-32 bg-burgundy-900/80 rounded-full h-3 border border-gold-500/30 overflow-hidden">
+                        <div id="progress-bar" class="bg-gradient-to-r from-gold-500 to-gold-400 h-full transition-all duration-500 w-10"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="mb-8">
+                <h4 id="question-text" class="text-lg sm:text-xl font-medium text-gold-100 mb-6 leading-relaxed">
+                    Loading question...
+                </h4>
+
+                <!-- Options Container -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Options populated dynamically -->
+                </div>
+                <div class="mt-3 text-center text-xs text-gold-400/60 font-medium">
+                    💡 <span class="hidden sm:inline">Keyboard shortcuts: Press keys <strong class="text-gold-300">1, 2, 3, 4</strong> to select and <strong class="text-gold-300">Enter</strong> for next question</span><span class="sm:hidden">Tap options or use keyboard</span>
+                </div>
+            </div>
+
+            <!-- Feedback Modal / Box -->
+            <div id="feedback-box" class="hidden rounded-2xl p-5 mb-6 border transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <div id="feedback-icon" class="text-3xl flex-shrink-0"></div>
+                    <div class="flex-1">
+                        <h5 id="feedback-title" class="font-serif font-bold text-lg mb-1"></h5>
+                        <p id="feedback-desc" class="text-sm opacity-90 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="app.nextQuestion()" class="hidden px-8 py-3 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-burgundy-950 font-bold rounded-xl gold-glow transition-all duration-200 transform hover:-translate-y-0.5">
+                    <span>Next Question (Enter ↵)</span>
+                    <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: RESULTS SCREEN -->
+        <div id="results-view" class="hidden w-full text-center glass-card rounded-3xl p-8 sm:p-12 gold-glow transition-all duration-500">
+            <div id="results-icon-container" class="inline-block p-5 rounded-3xl bg-gradient-to-tr from-burgundy-800 to-burgundy-600 border border-gold-500/40 mb-6">
+                <i id="results-icon" class="fa-solid fa-trophy text-6xl text-gold-400"></i>
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-500 to-burgundy-300 mb-2" id="results-title">
+                Quiz Completed!
+            </h2>
+            <p class="text-gold-100/80 text-base sm:text-lg mb-6" id="results-subtitle">
+                Fantastic job mastering your chemistry revision notes!
+            </p>
+
+            <div class="bg-burgundy-900/60 border border-gold-500/30 rounded-2xl p-6 max-w-md mx-auto mb-8">
+                <div class="text-xs text-gold-400 uppercase tracking-widest font-semibold mb-1">Final Score</div>
+                <div class="text-4xl sm:text-5xl font-extrabold text-gold-400 mb-2" id="final-score-display">50 / 50</div>
+                <p class="text-sm text-gold-200/90" id="results-message">You are officially an Acids & Bases chemistry genius!</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="app.restartQuiz()" class="w-full sm:w-auto px-8 py-4 font-bold text-burgundy-950 transition-all duration-300 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl hover:from-gold-300 hover:to-gold-500 gold-glow">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Try Again (Reshuffled)
+                </button>
+                <button onclick="app.returnToHome()" class="w-full sm:w-auto px-8 py-4 font-bold text-gold-300 transition-all duration-300 bg-burgundy-900/80 hover:bg-burgundy-800 border border-gold-500/40 rounded-2xl">
+                    <i class="fa-solid fa-house mr-2"></i> Back to Home
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="relative z-10 w-full py-4 border-t border-gold-500/20 bg-burgundy-950/90 text-center text-xs text-gold-400/80">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                <span>Chemistry Revision • Grade 11 Acids & Bases</span>
+            </div>
+            <div>
+                <span>Designed & Built with passion by <strong class="text-gold-400 underline decoration-gold-500">Yusuf Ghoneim</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        class SoundFX {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.08);
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                    gain.gain.setValueAtTime(0.2, now + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.08);
+                    osc.stop(now + i * 0.08 + 0.3);
+                });
+            }
+
+            playIncorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+
+            playFanfare() {
+                if (!this.enabled) return;
+                this.init();
+                const notes = [440, 554.37, 659.25, 880, 880, 880, 1108.73];
+                const times = [0, 0.15, 0.3, 0.45, 0.65, 0.8, 1.0];
+                const durations = [0.12, 0.12, 0.12, 0.18, 0.12, 0.12, 0.5];
+                
+                notes.forEach((freq, i) => {
+                    const t = this.ctx.currentTime + times[i];
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.25, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + durations[i]);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(t);
+                    osc.stop(t + durations[i]);
+                });
+            }
+        }
+
+        const masterQuestionBank = [
+            {
+                category: "Acid-Base Definitions",
+                question: "According to the Arrhenius theory, what specific ion is produced when an acid dissolves in water?",
+                options: [
+                    "Hydroxide ion (OH⁻)",
+                    "Hydronium ion (H₃O⁺)",
+                    "Hydrogen gas (H₂)",
+                    "Chloride ion (Cl⁻)"
+                ],
+                correctIndex: 1,
+                explanation: "Brilliant! Arrhenius defined an acid as a substance that produces hydronium ions (H₃O⁺) in water, while bases produce hydroxide ions (OH⁻)."
+            },
+            {
+                category: "Brønsted-Lowry Theory",
+                question: "In Brønsted-Lowry terminology, what is a base defined as?",
+                options: [
+                    "A proton (H⁺) donor",
+                    "An electron-pair acceptor",
+                    "A proton (H⁺) acceptor",
+                    "An electron-pair donor"
+                ],
+                correctIndex: 2,
+                explanation: "Spot on! A Brønsted-Lowry acid is a proton (H⁺) donor, whereas a Brønsted-Lowry base is a proton (H⁺) acceptor."
+            },
+            {
+                category: "Acid Properties",
+                question: "Which of the following describes the color change of litmus paper when tested with an acid?",
+                options: [
+                    "Red litmus turns blue",
+                    "Blue litmus turns red",
+                    "Litmus remains purple",
+                    "Yellow litmus turns green"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! Acids turn blue litmus paper red, while bases turn red litmus paper blue."
+            },
+            {
+                category: "Strong vs Weak Acids",
+                question: "What is the key difference between a strong acid and a weak acid?",
+                options: [
+                    "Strong acids are concentrated; weak acids are dilute.",
+                    "Strong acids completely ionize in water; weak acids partially ionize.",
+                    "Strong acids have a pH > 7; weak acids have a pH < 7.",
+                    "Strong acids contain carbon; weak acids do not."
+                ],
+                correctIndex: 1,
+                explanation: "Correct chemistry intuition! 'Strong' and 'weak' describe the degree of ionization in water, whereas 'concentrated' and 'dilute' describe the amount of solute."
+            },
+            {
+                category: "pH & pOH Calculations",
+                question: "If the hydronium ion concentration [H₃O⁺] is 1 × 10⁻³ M, what is the pH of the solution?",
+                options: [
+                    "3",
+                    "11",
+                    "7",
+                    "-3"
+                ],
+                correctIndex: 0,
+                explanation: "Nailed it! pH = -log[H₃O⁺]. Therefore, -log(1 × 10⁻³) = 3, classifying this solution as acidic."
+            },
+            {
+                category: "pH Scale Relations",
+                question: "At 25°C, what is the constant sum relation between pH and pOH in any aqueous solution?",
+                options: [
+                    "pH + pOH = 7",
+                    "pH × pOH = 14",
+                    "pH + pOH = 14",
+                    "pH - pOH = 0"
+                ],
+                correctIndex: 2,
+                explanation: "Spot on! pH + pOH = 14 always holds true in aqueous solutions at standard temperature."
+            },
+            {
+                category: "Conjugate Acid-Base Pairs",
+                question: "According to conjugate acid-base pairs, by how many H⁺ ions do a conjugate pair differ?",
+                options: [
+                    "Two H⁺ ions",
+                    "One H⁺ ion",
+                    "Three H⁺ ions",
+                    "Zero H⁺ ions"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! Conjugate acid-base pairs differ by exactly one proton (H⁺)."
+            },
+            {
+                category: "Lewis Theory",
+                question: "In Lewis acid-base theory, how is a Lewis acid defined?",
+                options: [
+                    "Electron-pair donor",
+                    "Proton donor",
+                    "Electron-pair acceptor",
+                    "Proton acceptor"
+                ],
+                correctIndex: 2,
+                explanation: "Fantastic! A Lewis acid accepts an electron pair, while a Lewis base donates an electron pair (e.g., BF₃ + NH₃)."
+            },
+            {
+                category: "Amphoteric Substances",
+                question: "Which of the following substances is classically known to be amphoteric (acting as both an acid and a base)?",
+                options: [
+                    "Sodium chloride (NaCl)",
+                    "Water (H₂O)",
+                    "Hydrochloric acid (HCl)",
+                    "Sodium hydroxide (NaOH)"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! Water (H₂O) is amphoteric—it can donate a proton acting as an acid or accept a proton acting as a base."
+            },
+            {
+                category: "Metals & Acid Reactions",
+                question: "What gas is typically produced when an acid reacts with an active metal?",
+                options: [
+                    "Oxygen gas (O₂)",
+                    "Carbon dioxide (CO₂)",
+                    "Hydrogen gas (H₂)",
+                    "Nitrogen gas (N₂)"
+                ],
+                correctIndex: 2,
+                explanation: "Correct! Acids react vigorously with active metals to produce hydrogen gas (H₂)."
+            },
+            {
+                category: "Arrhenius Theory",
+                question: "According to Arrhenius, what ion is produced when a base dissolves in water?",
+                options: [
+                    "Hydronium ion (H₃O⁺)",
+                    "Hydroxide ion (OH⁻)",
+                    "Hydrogen ion (H⁺)",
+                    "Oxide ion (O²⁻)"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! Arrhenius bases release hydroxide ions (OH⁻) in aqueous solution."
+            },
+            {
+                category: "Brønsted-Lowry Theory",
+                question: "In the reaction NH₃ + H₂O ⇌ NH₄⁺ + OH⁻, what acts as the Brønsted-Lowry acid?",
+                options: [
+                    "NH₃",
+                    "H₂O",
+                    "NH₄⁺",
+                    "OH⁻"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! Water (H₂O) donates a proton to become OH⁻, therefore acting as the Brønsted-Lowry acid."
+            },
+            {
+                category: "pH Scale Deep Dive",
+                question: "Between pH 2 and pH 5, which solution has a higher hydronium ion concentration ([H₃O⁺])?",
+                options: [
+                    "pH 5",
+                    "pH 2",
+                    "They have equal concentrations",
+                    "Cannot be determined"
+                ],
+                correctIndex: 1,
+                explanation: "Brilliant! Lower pH corresponds to a higher [H₃O⁺]. pH 2 is significantly more acidic than pH 5."
+            },
+            {
+                category: "Strong Acids",
+                question: "Which of the following is classified as a strong acid?",
+                options: [
+                    "Acetic acid (CH₃COOH)",
+                    "Phosphoric acid (H₃PO₄)",
+                    "Nitric acid (HNO₃)",
+                    "Carbonic acid (H₂CO₃)"
+                ],
+                correctIndex: 2,
+                explanation: "Correct! Nitric acid (HNO₃), along with HCl and H₂SO₄, completely ionizes in water and is a strong acid."
+            },
+            {
+                category: "Weak Acids",
+                question: "Which of the following is an example of a weak acid that only partially ionizes in water?",
+                options: [
+                    "Hydrochloric acid (HCl)",
+                    "Sulfuric acid (H₂SO₄)",
+                    "Phosphoric acid (H₃PO₄)",
+                    "Nitric acid (HNO₃)"
+                ],
+                correctIndex: 2,
+                explanation: "Spot on! Phosphoric acid (H₃PO₄) and acetic acid (CH₃COOH) are weak acids that partially ionize."
+            },
+            {
+                category: "Concentration vs Strength",
+                question: "What terminology describes the actual amount of acid solute dissolved in a specific solution volume?",
+                options: [
+                    "Strong vs Weak",
+                    "Concentrated vs Dilute",
+                    "Ionized vs Unionized",
+                    "Basic vs Acidic"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! 'Concentrated' and 'dilute' refer strictly to the amount of solute dissolved, whereas 'strong' and 'weak' refer to ionization."
+            },
+            {
+                category: "pOH Calculation",
+                question: "If the hydroxide ion concentration [OH⁻] is 1 × 10⁻⁴ M, what is the pOH?",
+                options: [
+                    "4",
+                    "10",
+                    "14",
+                    "-4"
+                ],
+                correctIndex: 0,
+                explanation: "Nailed it! pOH = -log[OH⁻]. Thus, -log(1 × 10⁻⁴) = 4."
+            },
+            {
+                category: "pH and pOH Relation",
+                question: "If a solution has a pOH of 5 at 25°C, what is its pH?",
+                options: [
+                    "5",
+                    "9",
+                    "14",
+                    "7"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! pH = 14 - pOH. Therefore, pH = 14 - 5 = 9 (making the solution basic)."
+            },
+            {
+                category: "Neutral Solutions",
+                question: "At 25°C, what is the exact pH of a neutral aqueous solution (where [H₃O⁺] = [OH⁻])?",
+                options: [
+                    "0",
+                    "7",
+                    "14",
+                    "1"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! A neutral solution at 25°C has a pH of exactly 7."
+            },
+            {
+                category: "Conjugate Pairs Example",
+                question: "In the dissociation HCl + H₂O → H₃O⁺ + Cl⁻, what is the conjugate acid of H₂O?",
+                options: [
+                    "Cl⁻",
+                    "HCl",
+                    "H₃O⁺",
+                    "OH⁻"
+                ],
+                correctIndex: 2,
+                explanation: "Brilliant! When H₂O accepts a proton, it forms H₃O⁺, its conjugate acid."
+            },
+            {
+                category: "Lewis Acid-Base",
+                question: "In the reaction BF₃ + NH₃ → BF₃NH₃, what role does BF₃ play?",
+                options: [
+                    "Lewis base",
+                    "Lewis acid",
+                    "Arrhenius base",
+                    "Bronsted acid"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! BF₃ accepts an electron pair from NH₃, acting as a Lewis acid."
+            },
+            {
+                category: "Lewis Acid-Base",
+                question: "In the reaction BF₃ + NH₃ → BF₃NH₃, what role does NH₃ play?",
+                options: [
+                    "Lewis acid",
+                    "Lewis base",
+                    "Arrhenius acid",
+                    "Proton donor"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! NH₃ donates its lone electron pair, functioning as a Lewis base."
+            },
+            {
+                category: "Amphoteric Behavior",
+                question: "When water reacts with HCl, how does water behave?",
+                options: [
+                    "As a Brønsted acid",
+                    "As a Brønsted base",
+                    "As a Lewis acid only",
+                    "As a spectator"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! Water accepts a proton from HCl to form H₃O⁺, acting as a Brønsted base."
+            },
+            {
+                category: "Amphoteric Behavior",
+                question: "When water reacts with NH₃, how does water behave?",
+                options: [
+                    "As a Brønsted base",
+                    "As a Brønsted acid",
+                    "As an electron-pair acceptor",
+                    "As a strong acid"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! Water donates a proton to NH₃, acting as a Brønsted acid."
+            },
+            {
+                category: "Base Properties",
+                question: "What color change does red litmus paper undergo when exposed to a base?",
+                options: [
+                    "Turns red",
+                    "Turns blue",
+                    "Turns yellow",
+                    "Remains red"
+                ],
+                correctIndex: 1,
+                explanation: "Nailed it! Bases turn red litmus paper blue."
+            },
+            {
+                category: "Neutralization",
+                question: "What are the typical products formed when an acid neutralizes a base?",
+                options: [
+                    "Salt and water",
+                    "Metal and hydrogen gas",
+                    "Ammonia and oxygen",
+                    "Carbon dioxide and water"
+                ],
+                correctIndex: 0,
+                explanation: "Fantastic! Neutralization reactions between acids and bases produce a salt and water."
+            },
+            {
+                category: "Calculations Practice",
+                question: "If [H₃O⁺] = 1 × 10⁻⁹ M, what is the pH and classification of the solution?",
+                options: [
+                    "pH = 9, Basic",
+                    "pH = 9, Acidic",
+                    "pH = 5, Acidic",
+                    "pH = 14, Neutral"
+                ],
+                correctIndex: 0,
+                explanation: "Correct! pH = -log(1 × 10⁻⁹) = 9. Since pH > 7, the solution is basic."
+            },
+            {
+                category: "Calculations Practice",
+                question: "If a solution has a pH of 12, what is its corresponding pOH at 25°C?",
+                options: [
+                    "12",
+                    "2",
+                    "14",
+                    "7"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! pOH = 14 - pH = 14 - 12 = 2."
+            },
+            {
+                category: "Summary Concepts",
+                question: "Which equation correctly defines pH?",
+                options: [
+                    "pH = log[H₃O⁺]",
+                    "pH = -log[H₃O⁺]",
+                    "pH = 14 - [OH⁻]",
+                    "pH = -ln[H₃O⁺]"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! pH is defined as the negative logarithm of the hydronium ion concentration: pH = -log[H₃O⁺]."
+            },
+            {
+                category: "Final Mastery Check",
+                question: "Which statement is entirely true regarding strong acids?",
+                options: [
+                    "They partially dissociate in aqueous solution.",
+                    "They have high pH values above 10.",
+                    "They completely ionize in water.",
+                    "They never react with active metals."
+                ],
+                correctIndex: 2,
+                explanation: "Brilliant! Strong acids undergo complete ionization in aqueous solution."
+            },
+            {
+                category: "Advanced Definitions",
+                question: "In the Brønsted-Lowry concept, what happens to an acid after it donates a proton?",
+                options: [
+                    "It becomes a strong base",
+                    "It forms its conjugate base",
+                    "It becomes neutral water",
+                    "It precipitates out of solution"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! When a Brønsted-Lowry acid gives away its H⁺ ion, the species remaining is its conjugate base."
+            },
+            {
+                category: "Advanced Definitions",
+                question: "What is the conjugate acid of ammonia (NH₃)?",
+                options: [
+                    "NH₂⁻",
+                    "NH₄⁺",
+                    "NO₃⁻",
+                    "OH⁻"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! When NH₃ accepts a proton (H⁺), it forms the ammonium ion, NH₄⁺."
+            },
+            {
+                category: "pH Scale Drill",
+                question: "If a solution has a pH of 4, what is the concentration of hydronium ions [H₃O⁺]?",
+                options: [
+                    "1 × 10⁻⁴ M",
+                    "1 × 10⁴ M",
+                    "4 M",
+                    "1 × 10⁻¹⁰ M"
+                ],
+                correctIndex: 0,
+                explanation: "Brilliant! Since pH = -log[H₃O⁺], a pH of 4 means [H₃O⁺] = 1 × 10⁻⁴ M."
+            },
+            {
+                category: "pH Scale Drill",
+                question: "Which pH value indicates the highest concentration of hydrogen/hydronium ions?",
+                options: [
+                    "pH 1",
+                    "pH 7",
+                    "pH 12",
+                    "pH 14"
+                ],
+                correctIndex: 0,
+                explanation: "Spot on! The lower the pH, the higher the hydronium ion concentration. pH 1 is extremely acidic."
+            },
+            {
+                category: "Acid Properties Drill",
+                question: "Which of the following substances will react with hydrochloric acid (HCl) to produce hydrogen gas?",
+                options: [
+                    "Copper (Cu)",
+                    "Zinc (Zn)",
+                    "Silver (Ag)",
+                    "Gold (Au)"
+                ],
+                correctIndex: 1,
+                    explanation: "Correct! Zinc is an active metal that reacts with acids to liberate H₂ gas, whereas unreactive metals like copper, silver, and gold do not."
+            },
+            {
+                category: "Base Properties Drill",
+                question: "What taste and texture characteristics are commonly associated with aqueous basic solutions?",
+                options: [
+                    "Sour taste and rough texture",
+                    "Bitter taste and slippery feel",
+                    "Sweet taste and sticky feel",
+                    "Salty taste and rigid texture"
+                ],
+                correctIndex: 1,
+                explanation: "Nailed it! Bases typically taste bitter and feel slippery or soapy to the touch."
+            },
+            {
+                category: "Lewis Theory Drill",
+                question: "Why is a proton (H⁺) classified as a Lewis acid?",
+                options: [
+                    "It donates a proton",
+                    "It accepts an electron pair",
+                    "It donates an electron pair",
+                    "It produces hydroxide in water"
+                ],
+                correctIndex: 1,
+                explanation: "Fantastic! A bare proton (H⁺) has an empty orbital and readily accepts an electron pair, making it a classic Lewis acid."
+            },
+            {
+                category: "Conjugate Pairs Drill",
+                question: "Identify the conjugate base of sulfuric acid (H₂SO₄) in its first dissociation step.",
+                options: [
+                    "SO₄²⁻",
+                    "HSO₄⁻",
+                    "H₂S",
+                    "OH⁻"
+                ],
+                correctIndex: 1,
+                explanation: "Correct! Removing one proton (H⁺) from H₂SO₄ yields the hydrogen sulfate ion, HSO₄⁻."
+            },
+            {
+                category: "Degree of Ionization",
+                question: "If 1 mol of acid is dissolved in water and only 0.01 mol actually ionizes into ions, how is this acid classified?",
+                options: [
+                    "Strong acid",
+                    "Weak acid",
+                    "Concentrated acid",
+                    "Neutral acid"
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! Partial ionization (0.01 mol out of 1 mol) defines a weak acid."
+            },
+            {
+                category: "Concentration vs Strength Drill",
+                question: "Can a weak acid solution be concentrated?",
+                options: [
+                    "No, weak acids are always dilute.",
+                    "Yes, by dissolving a large amount of the weak acid in a small volume of water.",
+                    "Only if heated to 100°C.",
+                    "No, concentration only applies to strong acids."
+                ],
+                correctIndex: 1,
+                explanation: "Brilliant distinction! Strength refers to ionization percentage, while concentration refers to solute amount per volume. You can have a concentrated solution of a weak acid (like acetic acid)."
+            },
+            {
+                category: "pOH Calculations Drill",
+                question: "If [OH⁻] = 1 × 10⁻² M, what is the pOH of the solution?",
+                options: [
+                    "2",
+                    "12",
+                    "-2",
+                    "7"
+                ],
+                correctIndex: 0,
+                explanation: "Correct! pOH = -log[OH⁻] = -log(1 × 10⁻²) = 2."
+            },
+            {
+                category: "Complete pH/pOH Calculation",
+                question: "If [H₃O⁺] = 1 × 10⁻¹⁰ M, what is the pH and is the solution acidic or basic?",
+                options: [
+                    "pH = 10, Acidic",
+                    "pH = 4, Basic",
+                    "pH = 10, Basic",
+                    "pH = 14, Neutral"
+                ],
+                correctIndex: 2,
+                explanation: "Spot on! pH = -log(1 × 10⁻¹⁰) = 10. Since 10 > 7, the solution is basic."
+            },
+            {
+                category: "Amphoteric Mastery",
+                question: "Which of the following ions can also act as an amphoteric species?",
+                options: [
+                    "HCO₃⁻",
+                    "Na⁺",
+                    "Cl⁻",
+                    "NO₃⁻"
+                ],
+                correctIndex: 0,
+                explanation: "Correct! The bicarbonate ion (HCO₃⁻) can accept a proton to form H₂CO₃ or donate a proton to form CO₃²⁻, making it amphoteric."
+            },
+            {
+                category: "Neutralization Mastery",
+                    question: "What is the net ionic equation for the strong acid-strong base neutralization between H₃O⁺ and OH⁻?",
+                options: [
+                    "H₃O⁺ + OH⁻ → 2H₂O",
+                    "H⁺ + OH⁻ → H₂O",
+                    "HCl + NaOH → NaCl + H₂O",
+                    "H₂ + O₂ → H₂O"
+                ],
+                correctIndex: 0,
+                explanation: "Brilliant! Hydronium reacts with hydroxide to form water molecules: H₃O⁺ + OH⁻ → 2H₂O."
+            },
+            {
+                category: "Arrhenius Limits",
+                question: "What is a major limitation of the Arrhenius acid-base theory?",
+                options: [
+                    "It only applies to gaseous substances.",
+                    "It requires aqueous solutions and does not explain basic properties of substances without OH⁻ like NH₃.",
+                    "It ignores hydronium ions entirely.",
+                    "It only works at temperatures above 100°C."
+                ],
+                correctIndex: 1,
+                explanation: "Spot on! Arrhenius theory is restricted to aqueous solutions and fails to explain why substances like NH₃ (which has no OH⁻ in its formula) act as bases."
+            },
+            {
+                category: "Brønsted-Lowry Mastery",
+                question: "In the reaction CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺, identify the Brønsted-Lowry acid pair.",
+                options: [
+                    "CH₃COOH and CH₃COO⁻",
+                    "H₂O and CH₃COOH",
+                    "CH₃COOH and H₃O⁺",
+                    "H₂O and CH₃COO⁻"
+                ],
+                correctIndex: 0,
+                explanation: "Correct! CH₃COOH (acid) and its conjugate base CH₃COO⁻ form one conjugate pair."
+            },
+            {
+                category: "Lewis Theory Mastery",
+                question: "In the formation of the hydronium ion (H⁺ + H₂O → H₃O⁺), what role does the water molecule play in Lewis terms?",
+                options: [
+                    "Lewis acid because it accepts H⁺",
+                    "Lewis base because it donates a lone pair of electrons to H⁺",
+                    "Spectator ion",
+                    "Arrhenius catalyst"
+                ],
+                correctIndex: 1,
+                explanation: "Fantastic! Water uses its oxygen atom's lone pair to bond with H⁺, acting as a Lewis base."
+            },
+            {
+                category: "Quick Formula Review",
+                question: "If you know the pH of a solution is 5.5, which formula would you use to find [H₃O⁺]?",
+                options: [
+                    "[H₃O⁺] = 10⁻ᵖᴴ",
+                    "[H₃O⁺] = log(pH)",
+                    "[H₃O⁺] = 14 - pH",
+                    "[H₃O⁺] = -log(pH)"
+                ],
+                correctIndex: 0,
+                explanation: "Spot on! The inverse of the logarithmic pH definition is [H₃O⁺] = 10⁻ᵖᴴ."
+            },
+            {
+                category: "Litmus & Indicators",
+                question: "What color does blue litmus paper remain when dipped into a neutral solution (pH 7)?",
+                options: [
+                    "It turns red",
+                    "It turns pink",
+                    "It remains blue",
+                    "It turns colorless"
+                ],
+                correctIndex: 2,
+                explanation: "Correct! Blue litmus paper stays blue in neutral and basic solutions (it only turns red in acidic solutions)."
+            },
+            {
+                category: "Final Grand Review",
+                question: "Which of the following correctly pairs a strong acid with its correct chemical formula?",
+                options: [
+                    "Acetic acid — CH₃COOH",
+                    "Carbonic acid — H₂CO₃",
+                    "Sulfuric acid — H₂SO₄",
+                    "Phosphoric acid — H₃PO₄"
+                ],
+                correctIndex: 2,
+                explanation: "Brilliant! Sulfuric acid (H₂SO₄) is one of the primary strong mineral acids, whereas acetic, carbonic, and phosphoric acids are weak."
+            }
+        ];
+
+        class QuizApp {
+            constructor() {
+                this.currentIndex = 0;
+                this.score = 0;
+                this.selectedAnswer = null;
+                this.isAnswered = false;
+                this.sound = new SoundFX();
+                this.activeQuestions = [];
+                this.initBubbles();
+                this.initKeyboardListeners();
+            }
+
+            initBubbles() {
+                const container = document.getElementById('bubble-container');
+                for (let i = 0; i < 20; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    const size = Math.random() * 24 + 8;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${Math.random() * 100}%`;
+                    bubble.style.animationDuration = `${Math.random() * 12 + 8}s`;
+                    bubble.style.animationDelay = `${Math.random() * 5}s`;
+                    container.appendChild(bubble);
+                }
+            }
+
+            initKeyboardListeners() {
+                window.addEventListener('keydown', (e) => {
+                    const quizView = document.getElementById('quiz-view');
+                    if (quizView.classList.contains('hidden')) return;
+
+                    // Number keys 1-4
+                    if (['1', '2', '3', '4'].includes(e.key)) {
+                        const index = parseInt(e.key) - 1;
+                        const q = this.activeQuestions[this.currentIndex];
+                        if (q && index < q.options.length && !this.isAnswered) {
+                            this.selectAnswer(index);
+                        }
+                    }
+
+                    // Enter key for next question
+                    if (e.key === 'Enter') {
+                        const nextBtn = document.getElementById('next-btn');
+                        if (!nextBtn.classList.contains('hidden')) {
+                            this.nextQuestion();
+                        }
+                    }
+                });
+            }
+
+            toggleSound() {
+                this.sound.enabled = !this.sound.enabled;
+                const status = document.getElementById('sound-status');
+                const icon = document.getElementById('sound-icon');
+                if (this.sound.enabled) {
+                    status.textContent = "Sound ON";
+                    icon.className = "fa-solid fa-volume-high text-gold-400";
+                    this.sound.playClick();
+                } else {
+                    status.textContent = "Sound OFF";
+                    icon.className = "fa-solid fa-volume-xmark text-gold-400/50";
+                }
+            }
+
+            startQuiz() {
+                this.sound.playClick();
+                this.currentIndex = 0;
+                this.score = 0;
+                
+                // Shuffle and pick 50 questions randomly from masterQuestionBank
+                this.activeQuestions = [...masterQuestionBank].sort(() => Math.random() - 0.5);
+
+                document.getElementById('home-view').classList.add('hidden');
+                document.getElementById('results-view').classList.add('hidden');
+                document.getElementById('quiz-view').classList.remove('hidden');
+                this.loadQuestion();
+            }
+
+            returnToHome() {
+                this.sound.playClick();
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('results-view').classList.add('hidden');
+                document.getElementById('home-view').classList.remove('hidden');
+            }
+
+            loadQuestion() {
+                this.isAnswered = false;
+                this.selectedAnswer = null;
+                const q = this.activeQuestions[this.currentIndex];
+
+                document.getElementById('question-category').textContent = q.category;
+                document.getElementById('question-counter').textContent = `Question ${this.currentIndex + 1} of ${this.activeQuestions.length}`;
+                document.getElementById('current-score').textContent = `${this.score} pts`;
+                document.getElementById('question-text').textContent = q.question;
+
+                // Progress bar
+                const progressPercent = ((this.currentIndex) / this.activeQuestions.length) * 100;
+                document.getElementById('progress-bar').style.width = `${Math.max(progressPercent, 5)}%`;
+
+                // Hide feedback and next button
+                document.getElementById('feedback-box').classList.add('hidden');
+                document.getElementById('next-btn').classList.add('hidden');
+
+                // Load options
+                const optionsContainer = document.getElementById('options-container');
+                optionsContainer.innerHTML = '';
+
+                q.options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left p-4 rounded-xl bg-burgundy-900/60 border border-gold-500/20 hover:border-gold-500/60 hover:bg-burgundy-800/80 text-gold-100 font-medium transition-all duration-200 flex items-center justify-between group';
+                    btn.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-lg bg-burgundy-950 border border-gold-500/30 flex items-center justify-center text-xs font-bold text-gold-400 group-hover:border-gold-400">${index + 1}</span>
+                            <span class="text-sm sm:text-base">${option}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-0 group-hover:opacity-100 text-gold-400 transition-opacity"></i>
+                    `;
+                    btn.onclick = () => this.selectAnswer(index);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
+            selectAnswer(index) {
+                if (this.isAnswered) return;
+                this.isAnswered = true;
+                this.selectedAnswer = index;
+                this.sound.playClick();
+
+                const q = this.activeQuestions[this.currentIndex];
+                const optionsContainer = document.getElementById('options-container');
+                const buttons = optionsContainer.getElementsByTagName('button');
+
+                const isCorrect = (index === q.correctIndex);
+
+                // Style buttons
+                for (let i = 0; i < buttons.length; i++) {
+                    buttons[i].disabled = true;
+                    if (i === q.correctIndex) {
+                        buttons[i].className = 'w-full text-left p-4 rounded-xl bg-emerald-950/80 border border-emerald-500 text-emerald-200 font-medium flex items-center justify-between shadow-lg';
+                        buttons[i].innerHTML += `<i class="fa-solid fa-check text-emerald-400 text-lg"></i>`;
+                    } else if (i === index && !isCorrect) {
+                        buttons[i].className = 'w-full text-left p-4 rounded-xl bg-rose-950/80 border border-rose-500 text-rose-200 font-medium flex items-center justify-between animate-shake';
+                        buttons[i].innerHTML += `<i class="fa-solid fa-xmark text-rose-400 text-lg"></i>`;
+                    } else {
+                        buttons[i].className = 'w-full text-left p-4 rounded-xl bg-burgundy-950/40 border border-gold-500/10 text-gold-200/50 font-medium flex items-center justify-between opacity-50';
+                    }
+                }
+
+                // Feedback box
+                const feedbackBox = document.getElementById('feedback-box');
+                const feedbackIcon = document.getElementById('feedback-icon');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackDesc = document.getElementById('feedback-desc');
+
+                feedbackBox.classList.remove('hidden');
+
+                if (isCorrect) {
+                    this.score += 10;
+                    document.getElementById('current-score').textContent = `${this.score} pts`;
+                    this.sound.playCorrect();
+
+                    feedbackBox.className = 'rounded-2xl p-5 mb-6 border bg-emerald-950/60 border-emerald-500/50 text-emerald-100 animate-success-pulse';
+                    feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+                    feedbackTitle.textContent = "Brilliant! Spot On!";
+                    feedbackDesc.textContent = q.explanation;
+
+                    // Trigger confetti burst
+                    confetti({
+                        particleCount: 80,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#D4AF37', '#e6c567', '#a32b4b', '#ffffff']
+                    });
+                } else {
+                    this.sound.playIncorrect();
+                    feedbackBox.className = 'rounded-2xl p-5 mb-6 border bg-rose-950/60 border-rose-500/50 text-rose-100 animate-shake';
+                    feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
+                    feedbackTitle.textContent = "Not quite! Keep learning!";
+                    feedbackDesc.textContent = `The correct answer was option ${q.correctIndex + 1}. ${q.explanation}`;
+                }
+
+                // Show next button
+                document.getElementById('next-btn').classList.remove('hidden');
+                document.getElementById('next-btn').focus();
+            }
+
+            nextQuestion() {
+                this.sound.playClick();
+                this.currentIndex++;
+                if (this.currentIndex < this.activeQuestions.length) {
+                    this.loadQuestion();
+                } else {
+                    this.showResults();
+                }
+            }
+
+            showResults() {
+                this.sound.playFanfare();
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('results-view').classList.remove('hidden');
+
+                const maxScore = this.activeQuestions.length * 10;
+                document.getElementById('final-score-display').textContent = `${this.score} / ${maxScore}`;
+
+                const percentage = (this.score / maxScore) * 100;
+                const titleEl = document.getElementById('results-title');
+                const subEl = document.getElementById('results-subtitle');
+                const msgEl = document.getElementById('results-message');
+                const iconEl = document.getElementById('results-icon');
+
+                if (percentage === 100) {
+                    titleEl.textContent = "Flawless Chemistry Mastery!";
+                    subEl.textContent = "You answered every single question correctly across all 50 questions!";
+                    msgEl.textContent = "Yusuf Ghoneim would be incredibly proud of your elite mastery over Acids & Bases!";
+                    iconEl.className = "fa-solid fa-crown text-6xl text-gold-400 animate-bounce";
+                    
+                    // Grand confetti celebration
+                    confetti({
+                        particleCount: 180,
+                        spread: 120,
+                        origin: { y: 0.5 },
+                        colors: ['#D4AF37', '#e6c567', '#a32b4b', '#ffffff', '#22c55e']
+                    });
+                } else if (percentage >= 70) {
+                    titleEl.textContent = "Outstanding Performance!";
+                    subEl.textContent = "You have a stellar grasp of chemistry concepts.";
+                    msgEl.textContent = "Great job reviewing 50 questions! A little more practice and you'll hit 100%.";
+                    iconEl.className = "fa-solid fa-award text-6xl text-gold-400";
+                } else {
+                    titleEl.textContent = "Good Effort! Keep Revising.";
+                    subEl.textContent = "Review your notes and try again to boost your score.";
+                    msgEl.textContent = "Chemistry is all about repetition. You've got this!";
+                    iconEl.className = "fa-solid fa-book-open text-6xl text-gold-400";
+                }
+            }
+
+            restartQuiz() {
+                this.startQuiz();
+            }
+        }
+
+        // Initialize application instance globally
+        const app = new QuizApp();
+    </script>
+</body>
+</html>
